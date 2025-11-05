@@ -1,0 +1,49 @@
+﻿@model IEnumerable<RestaurantApp.Models.Dish>
+
+@{
+    ViewData["Title"] = "Menu Restauracji";
+}
+
+<h1 class="mb-4">Menu Restauracji</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Dodaj nowe danie</a>
+</p>
+
+<div class="btn-group mb-3" role="group">
+    <a asp-action="Index" class="btn btn-outline-secondary">Wszystkie</a>
+    <a asp-action="Index" asp-route-category="1" class="btn btn-outline-secondary">Śniadania</a>
+    <a asp-action="Index" asp-route-category="2" class="btn btn-outline-secondary">Obiady</a>
+    <a asp-action="Index" asp-route-category="3" class="btn btn-outline-secondary">Kolacje</a>
+</div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                @if (!string.IsNullOrEmpty(item.ImagePath))
+                {
+                    <img src="@item.ImagePath" class="card-img-top" alt="@item.Name" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <img src="~/images/no-image.jpg" class="card-img-top" alt="Brak zdjęcia" style="height: 200px; object-fit: cover;">
+                }
+
+                <div class="card-body">
+                    <h5 class="card-title">@item.Name</h5>
+                    <span class="badge bg-info text-dark">@item.Category</span>
+                    <p class="card-text mt-2">@item.Description</p>
+                    <h6 class="text-primary mt-2">@item.Price.ToString("C")</h6>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Szczegóły</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Usuń</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
