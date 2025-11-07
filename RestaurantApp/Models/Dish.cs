@@ -30,3 +30,9 @@ namespace RestaurantApp.Models
         Kolacja = 3
     }
 }
+public ICollection<Rating>? Ratings { get; set; }
+
+[NotMapped]
+public double AverageRating => Ratings?.Any() == true
+    ? Ratings.Average(r => r.Stars)
+    : 0;

@@ -17,9 +17,15 @@ namespace RestaurantApp.Controllers
         }
 
         // GET: Dishes
-        public async Task<IActionResult> Index(MealType? category)
+        public async Task<IActionResult> Index(string searchString, MealType? category)
         {
             var dishes = _context.Dishes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                dishes = dishes.Where(d => d.Name.Contains(searchString) ||
+                                           d.Description.Contains(searchString));
+            }
 
             if (category.HasValue)
             {
@@ -61,7 +67,6 @@ namespace RestaurantApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Obsługa przesyłania zdjęcia
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "dishes");
@@ -119,7 +124,6 @@ namespace RestaurantApp.Controllers
                 {
                     if (imageFile != null && imageFile.Length > 0)
                     {
-                        // Usuń stare zdjęcie jeśli istnieje
                         if (!string.IsNullOrEmpty(dish.ImagePath))
                         {
                             var oldImagePath = Path.Combine(_environment.WebRootPath, dish.ImagePath.TrimStart('/'));
@@ -129,7 +133,6 @@ namespace RestaurantApp.Controllers
                             }
                         }
 
-                        // Zapisz nowe zdjęcie
                         var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "dishes");
                         Directory.CreateDirectory(uploadsFolder);
 
@@ -192,7 +195,6 @@ namespace RestaurantApp.Controllers
 
             if (dish != null)
             {
-                // Usuń zdjęcie
                 if (!string.IsNullOrEmpty(dish.ImagePath))
                 {
                     var imagePath = Path.Combine(_environment.WebRootPath, dish.ImagePath.TrimStart('/'));
