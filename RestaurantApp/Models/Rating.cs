@@ -1,18 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-using RestaurantApp.Models;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Rating
+namespace RestaurantApp.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Rating
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public int DishId { get; set; }
-    public Dish Dish { get; set; }
+        public int DishId { get; set; }
+        public Dish? Dish { get; set; }
 
-    [Range(1, 5)]
-    public int Stars { get; set; }
+        [Range(1, 5)]
+        public int Stars { get; set; }
 
-    public string? Comment { get; set; }
+        [StringLength(1000)]
+        public string? Comment { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

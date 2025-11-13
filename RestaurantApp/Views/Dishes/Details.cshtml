@@ -1,0 +1,43 @@
+﻿@model RestaurantApp.Models.Dish
+
+@{
+    ViewData["Title"] = "Szczegóły dania";
+}
+
+<h2>@Model.Name</h2>
+
+<p><strong>Opis:</strong> @Model.Description</p>
+<p><strong>Cena:</strong> @Model.Price zł</p>
+<p><strong>Kategoria:</strong> @Model.Category</p>
+
+@if (!string.IsNullOrEmpty(Model.ImagePath))
+{
+    <img src="@Model.ImagePath" alt="@Model.Name" style="max-width:300px; margin-top:10px;" />
+}
+
+<p><strong>Średnia ocena:</strong> @Model.AverageRating.ToString("0.0") ★</p>
+
+<hr />
+
+<h3>Oceny</h3>
+
+@if (Model.Ratings != null && Model.Ratings.Any())
+{
+    <ul>
+        @foreach (var rating in Model.Ratings)
+        {
+            <li>
+                <strong>@rating.Stars ★</strong> - @rating.Comment
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Brak ocen.</p>
+}
+
+<a asp-controller="Ratings" asp-action="Create" asp-route-DishId="@Model.Id" class="btn btn-primary">
+    Dodaj ocenę
+</a>
+<a asp-action="Index" class="btn btn-secondary">Powrót</a>
