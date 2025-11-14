@@ -38,18 +38,11 @@ namespace RestaurantApp.Controllers
         // GET: Dishes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var dish = await _context.Dishes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var dish = await _context.Dishes.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (dish == null)
-            {
-                return NotFound();
-            }
+            if (dish == null) return NotFound();
 
             return View(dish);
         }
@@ -63,7 +56,7 @@ namespace RestaurantApp.Controllers
         // POST: Dishes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Price,Category")] Dish dish, IFormFile? imageFile)
+        public async Task<IActionResult> Create([Bind("Name,Description,Price,Category,ImagePath")] Dish dish, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
@@ -94,16 +87,10 @@ namespace RestaurantApp.Controllers
         // GET: Dishes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var dish = await _context.Dishes.FindAsync(id);
-            if (dish == null)
-            {
-                return NotFound();
-            }
+            if (dish == null) return NotFound();
 
             return View(dish);
         }
@@ -113,10 +100,7 @@ namespace RestaurantApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Category,ImagePath")] Dish dish, IFormFile? imageFile)
         {
-            if (id != dish.Id)
-            {
-                return NotFound();
-            }
+            if (id != dish.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -127,10 +111,7 @@ namespace RestaurantApp.Controllers
                         if (!string.IsNullOrEmpty(dish.ImagePath))
                         {
                             var oldImagePath = Path.Combine(_environment.WebRootPath, dish.ImagePath.TrimStart('/'));
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
+                            if (System.IO.File.Exists(oldImagePath)) System.IO.File.Delete(oldImagePath);
                         }
 
                         var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "dishes");
@@ -152,14 +133,8 @@ namespace RestaurantApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DishExists(dish.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!_context.Dishes.Any(e => e.Id == id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -170,18 +145,10 @@ namespace RestaurantApp.Controllers
         // GET: Dishes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var dish = await _context.Dishes
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (dish == null)
-            {
-                return NotFound();
-            }
+            var dish = await _context.Dishes.FirstOrDefaultAsync(m => m.Id == id);
+            if (dish == null) return NotFound();
 
             return View(dish);
         }
@@ -192,28 +159,19 @@ namespace RestaurantApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dish = await _context.Dishes.FindAsync(id);
-
             if (dish != null)
             {
                 if (!string.IsNullOrEmpty(dish.ImagePath))
                 {
                     var imagePath = Path.Combine(_environment.WebRootPath, dish.ImagePath.TrimStart('/'));
-                    if (System.IO.File.Exists(imagePath))
-                    {
-                        System.IO.File.Delete(imagePath);
-                    }
+                    if (System.IO.File.Exists(imagePath)) System.IO.File.Delete(imagePath);
                 }
 
                 _context.Dishes.Remove(dish);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool DishExists(int id)
-        {
-            return _context.Dishes.Any(e => e.Id == id);
         }
     }
 }

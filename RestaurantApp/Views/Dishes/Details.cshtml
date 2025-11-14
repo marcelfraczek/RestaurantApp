@@ -7,15 +7,19 @@
 <h2>@Model.Name</h2>
 
 <p><strong>Opis:</strong> @Model.Description</p>
-<p><strong>Cena:</strong> @Model.Price zł</p>
+<p><strong>Cena:</strong> @Model.Price.ToString("C")</p>
 <p><strong>Kategoria:</strong> @Model.Category</p>
 
 @if (!string.IsNullOrEmpty(Model.ImagePath))
 {
     <img src="@Model.ImagePath" alt="@Model.Name" style="max-width:300px; margin-top:10px;" />
 }
+else
+{
+    <img src="~/images/no-image.jpg" alt="Brak zdjęcia" style="max-width:300px; margin-top:10px;" />
+}
 
-<p><strong>Średnia ocena:</strong> @Model.AverageRating.ToString("0.0") ★</p>
+<p><strong>Średnia ocena:</strong> @(Model.Ratings != null && Model.Ratings.Any() ? Model.AverageRating.ToString("0.0") : "Brak") ★</p>
 
 <hr />
 

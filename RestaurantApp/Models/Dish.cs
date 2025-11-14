@@ -8,7 +8,7 @@ namespace RestaurantApp.Models
 {
     public class Dish
     {
-        [Key] // Klucz główny
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Nazwa dania jest wymagana")]
@@ -28,20 +28,34 @@ namespace RestaurantApp.Models
         public MealType Category { get; set; }
 
         [StringLength(255)]
-        public string? ImagePath { get; set; } // Ścieżka do zdjęcia
+        public string? ImagePath { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Relacja do ocen (umieszczone wewnątrz klasy)
         public ICollection<Rating>? Ratings { get; set; }
 
         [NotMapped]
         public double AverageRating => Ratings?.Any() == true
             ? Ratings.Average(r => r.Stars)
             : 0;
+
+        public ICollection<DishImage>? Images { get; set; }
     }
 
-    // Enum dla kategorii posiłków
+    public class DishImage
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string ImagePath { get; set; }
+
+        public bool IsMainImage { get; set; }
+
+        public int DishId { get; set; }
+        public Dish Dish { get; set; }
+    }
+
     public enum MealType
     {
         Śniadanie = 1,
