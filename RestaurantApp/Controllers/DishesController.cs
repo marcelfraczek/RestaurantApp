@@ -2,6 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantApp.Data;
 using RestaurantApp.Models;
+using Microsoft.AspNetCore.Http;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
 
 namespace RestaurantApp.Controllers
 {
@@ -41,7 +45,6 @@ namespace RestaurantApp.Controllers
             if (id == null) return NotFound();
 
             var dish = await _context.Dishes.FirstOrDefaultAsync(m => m.Id == id);
-
             if (dish == null) return NotFound();
 
             return View(dish);
@@ -172,6 +175,39 @@ namespace RestaurantApp.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Eksport menu do PDF
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var dishes = await _context.Dishes.OrderBy(d => d.Category).ToListAsync();
+
+            using (var memoryStream = new MemoryStream())
+            {
+                Document doc = new Document(PageSize.A4);
+                PdfWriter.GetInstance(doc, memoryStream);
+                doc.Open();
+
+                var titleFont = FontFactory.GetFont("Arial", 16, Font.BOLD);
+                var headerFont = FontFactory.GetFont("Arial", 12, Font.BOLD);
+                var bodyFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
+
+                doc.Add(new Paragraph("Menu Restauracji", titleFont));
+                doc.Add(new Paragraph(" "));
+
+                foreach (var dish in dishes)
+                {
+                    doc.Add(new Paragraph($"Nazwa: {dish.Name}", headerFont));
+                    doc.Add(new Paragraph($"Kategoria: {dish.Category}", bodyFont));
+                    doc.Add(new Paragraph($"Opis: {dish.Description}", bodyFont));
+                    doc.Add(new Paragraph($"Cena: {dish.Price:C}", bodyFont));
+                    doc.Add(new Paragraph(" "));
+                }
+
+                doc.Close();
+                var pdfBytes = memoryStream.ToArray();
+                return File(pdfBytes, "application/pdf", "menu.pdf");
+            }
         }
     }
 }
