@@ -178,34 +178,39 @@ namespace RestaurantApp.Controllers
         }
 
         // Eksport menu do PDF
+        [HttpGet]
         public async Task<IActionResult> ExportToPdf()
         {
-            var dishes = await _context.Dishes.OrderBy(d => d.Category).ToListAsync();
+            var dishes = await _context.Dishes
+                .OrderBy(d => d.Category)
+                .ToListAsync();
 
-            using (var memoryStream = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                Document doc = new Document(PageSize.A4);
-                PdfWriter.GetInstance(doc, memoryStream);
-                doc.Open();
+                var document = new Document(PageSize.A4, 36, 36, 36, 36);
+                var writer = PdfWriter.GetInstance(document, ms);
+                document.Open();
 
-                var titleFont = FontFactory.GetFont("Arial", 16, Font.BOLD);
-                var headerFont = FontFactory.GetFont("Arial", 12, Font.BOLD);
-                var bodyFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
+                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
+                var normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
 
-                doc.Add(new Paragraph("Menu Restauracji", titleFont));
-                doc.Add(new Paragraph(" "));
+                document.Add(new Paragraph("Menu restauracji", titleFont));
+                document.Add(new Paragraph($"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm}", normalFont));
+                document.Add(new Paragraph(" "));
 
                 foreach (var dish in dishes)
                 {
-                    doc.Add(new Paragraph($"Nazwa: {dish.Name}", headerFont));
-                    doc.Add(new Paragraph($"Kategoria: {dish.Category}", bodyFont));
-                    doc.Add(new Paragraph($"Opis: {dish.Description}", bodyFont));
-                    doc.Add(new Paragraph($"Cena: {dish.Price:C}", bodyFont));
-                    doc.Add(new Paragraph(" "));
+                    var namePara = new Paragraph(dish.Name + " — " + dish.Price.ToString("C"), titleFont);
+                    document.Add(namePara);
+                    var descPara = new Paragraph(dish.Description ?? string.Empty, normalFont);
+                    document.Add(descPara);
+                    document.Add(new Paragraph(" "));
                 }
 
-                doc.Close();
-                var pdfBytes = memoryStream.ToArray();
+                document.Close();
+                writer.Close();
+
+                var pdfBytes = ms.ToArray();
                 return File(pdfBytes, "application/pdf", "menu.pdf");
             }
         }

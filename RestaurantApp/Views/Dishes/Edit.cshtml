@@ -1,6 +1,48 @@
-﻿namespace RestaurantApp.Views.Dishes
-{
-    public class Edit
-    {
-    }
-}
+﻿@model RestaurantApp.Models.Dish
+
+<h2>Edytuj danie</h2>
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label>Nazwa</label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+
+    <div>
+        <label>Opis</label>
+        <textarea asp-for="Description"></textarea>
+        <span asp-validation-for="Description"></span>
+    </div>
+
+    <div>
+        <label>Cena</label>
+        <input asp-for="Price" />
+        <span asp-validation-for="Price"></span>
+    </div>
+
+    <div>
+        <label>Kategoria</label>
+        <select asp-for="Category" asp-items="Html.GetEnumSelectList<MealType>()"></select>
+        <span asp-validation-for="Category"></span>
+    </div>
+
+    <div>
+        <label>Aktualne zdjęcie</label><br />
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" width="150" />
+        }
+    </div>
+
+    <div>
+        <label>Nowe zdjęcie</label>
+        <input type="file" name="imageFile" />
+    </div>
+
+    <button type="submit">Zapisz</button>
+</form>
+
+<a asp-action="Index">Powrót</a>
